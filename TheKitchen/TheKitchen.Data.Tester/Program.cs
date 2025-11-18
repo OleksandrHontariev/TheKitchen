@@ -9,8 +9,8 @@ using TheKitchen.Data.Entities;
 using System.Collections.Generic;
 
 string dbName = "TheKitchen";
-// CreateDatabase(dbName);
-CRUDL_Kitchen();
+CreateDatabase(dbName);
+Console.WriteLine("Database created successfully");
 
 Console.ReadLine();
 
@@ -29,6 +29,14 @@ static void CreateDatabase(string dbName)
         connection_2.Open();
         string scriptsFolter = Path.Combine(AppContext.BaseDirectory, "Sql", "Tables");
         DatabaseCreator.CreateDatabaseTables(connection_2, scriptsFolter);
+        IKitchenRepository kitchenRepository = new KitchenRepository(connection_2);
+        int id = kitchenRepository.Add(new Kitchen {
+                                        Name = "Puzata Hata",
+                                        Description = "Общепит пузатая хата",
+                                        TablesCount = 78
+                                    });
+
+        DatabaseCreator.SeedStaticData(connection_2, id, Path.Combine(AppContext.BaseDirectory, "Sql", "Seed"));
     }
 }
 
