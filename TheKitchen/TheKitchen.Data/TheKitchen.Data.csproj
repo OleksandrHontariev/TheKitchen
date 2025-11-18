@@ -10,10 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Repos\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="Sql\**\*" CopyToOutputDirectory="Always"></None>
   </ItemGroup>
   
