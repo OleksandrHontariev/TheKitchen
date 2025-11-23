@@ -11,11 +11,11 @@ using System.Diagnostics;
 
 namespace TheKitchen.Data.Repos
 {
-    public class IngredientsRepository : IIngredientsRepository
+    public class IngredientRepository : IIngredientRepository
     {
         private readonly Logger Logger = LogManager.GetCurrentClassLogger();
         IDbConnection _connection;
-        public IngredientsRepository(IDbConnection connection)
+        public IngredientRepository(IDbConnection connection)
         {
             _connection = connection;
         }
@@ -49,23 +49,53 @@ namespace TheKitchen.Data.Repos
             }
         }
 
+        public Ingredient GetById(int id)
+        {
+            string sql = "SELECT * FROM Ingredients WHERE Id = @Id";
+            Ingredient ingredient = null;
+            try
+            {
+                ingredient = _connection.QueryFirstOrDefault<Ingredient>(sql, new { Id = id });
+                if (ingredient == null)
+                {
+                    Logger.Info($"Ingredient with Id={id} not found.");
+                } else
+                {
+                    Logger.Info($"Retrieved ingredient: {ingredient}");
+                }
+                return ingredient;
+            } catch(Exception ex)
+            {
+                Logger.Error(ex, $"Error fetching ingredient Id={id}");
+                throw;
+            }
+        }
+
         public PagedResult<Ingredient> GetPagedBySearch(int kitchenId, int? categoryId, string query, int page, int pageSize)
         {
             string pagedBySearchSql = @"
                                         SELECT *
                                         FROM Ingredients
-                                        WHERE KitchenId = @KitchenId
-                                            AND (@CategoryId IS NULL OR CategoryId = @CategoryId)
+                                        WHERE 
+                                            KitchenId = @KitchenId
+                                            AND (
+                                                    (@CategoryId IS NULL AND CategoryId IS NULL)
+                                                 OR (@CategoryId IS NOT NULL AND CategoryId = @CategoryId)
+                                                )
                                             AND (@Query IS NULL OR Title LIKE '%' + @Query + '%')
-                                        ORDER BY Id
+                                        ORDER BY Title
                                         OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
                                     ";
 
             string totalCountSql = @"
                                     SELECT COUNT(*)
                                     FROM Ingredients
-                                    WHERE KitchenId = @KitchenId
-                                        AND (@CategoryId IS NULL OR CategoryId = @CategoryId)
+                                    WHERE 
+                                        KitchenId = @KitchenId
+                                        AND (
+                                                (@CategoryId IS NULL AND CategoryId IS NULL)
+                                             OR (@CategoryId IS NOT NULL AND CategoryId = @CategoryId)
+                                            )
                                         AND (@Query IS NULL OR Title LIKE '%' + @Query + '%');
                                 ";
 

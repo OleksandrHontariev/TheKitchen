@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace TheKitchen.Data.Entities
 {
@@ -14,5 +15,8 @@ namespace TheKitchen.Data.Entities
 		public string Title { get; set; }
 		public int? BaseUnit { get; set; }
 		public decimal StockQuantity { get; set; } = default;
+
+        public override string ToString() =>
+            $"[Id={Id}, KitchenId={KitchenId}, CategoryId=\"{CategoryId}\", Title=\"{Title}\", BaseUnit=\"{BaseUnit}\", StockQuantity={StockQuantity}]";
     }
 }

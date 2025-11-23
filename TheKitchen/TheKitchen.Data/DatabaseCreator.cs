@@ -33,6 +33,7 @@ namespace TheKitchen.Data
         {
             string[] files = {
                 "Kitchens.sql",
+                "RecipeCategories.sql",
                 "Recipes.sql",
                 "Units.sql",
                 "IngredientCategories.sql",

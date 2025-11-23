@@ -14,6 +14,6 @@ namespace TheKitchen.Data.Entities
         public int? TablesCount { get; set; }
         public DateTime CreatedAt { get; set; }
         public override string ToString() =>
-            $"[Id = {Id}, Name = {Name}, Description = {Description}, TablesCount = {TablesCount}, CreatedAt = {CreatedAt} ]";
+            $"[Id={Id}, Name=\"{Name}\", Description=\"{Description}\", TablesCount={TablesCount}, CreatedAt={CreatedAt:yyyy-MM-dd HH:mm:ss}]";
     }
 }
