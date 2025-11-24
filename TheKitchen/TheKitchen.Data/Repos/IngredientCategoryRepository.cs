@@ -19,13 +19,13 @@ namespace TheKitchen.Data.Repos
         {
             _connection = connection;
         }
-        public PagedResult<IngredientCategory> GetPagedBySearch(int kitchenId, int? parentCategoryId, string query, int page, int pageSize)
+        public PagedResult<IngredientCategory> GetPagedBySearch(int kitchenId, int? parentIngredientCategoryId, string query, int page, int pageSize)
         {
             string pagedBySearchSql = @"
                                     SELECT *
                                     FROM IngredientCategories
                                     WHERE KitchenId = @KitchenId
-                                        AND (@ParentCategoryId IS NULL OR ParentCategoryId = @ParentCategoryId)
+                                        AND (@ParentIngredientCategoryId IS NULL OR ParentIngredientCategoryId = @ParentIngredientCategoryId)
                                         AND (@Query IS NULL OR Name LIKE '%' + @Query + '%')
                                     ORDER BY Name
                                     OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -35,7 +35,7 @@ namespace TheKitchen.Data.Repos
                                     FROM IngredientCategories
                                     WHERE 
                                         KitchenId = @KitchenId
-                                        AND (@ParentCategoryId IS NULL OR ParentCategoryId = @ParentCategoryId)
+                                        AND (@ParentIngredientCategoryId IS NULL OR ParentIngredientCategoryId = @ParentIngredientCategoryId)
                                         AND (@Query IS NULL OR Name LIKE '%' + @Query + '%');
                                 ";
             try
@@ -44,7 +44,7 @@ namespace TheKitchen.Data.Repos
                 var parameters = new
                 {
                     KitchenId = kitchenId,
-                    ParentCategoryId = parentCategoryId,
+                    ParentIngredientCategoryId = parentIngredientCategoryId,
                     Query = string.IsNullOrWhiteSpace(query) ? null : query,
                     Offset = offset,
                     PageSize = pageSize
@@ -88,8 +88,8 @@ namespace TheKitchen.Data.Repos
         }
         public int Add(IngredientCategory category)
         {
-            string sql = @"INSERT INTO IngredientCategories (KitchenId, ParentCategoryId, Name)
-                        VALUES (@KitchenId, @ParentCategoryId, @Name)
+            string sql = @"INSERT INTO IngredientCategories (KitchenId, ParentIngredientCategoryId, Name)
+                        VALUES (@KitchenId, @ParentIngredientCategoryId, @Name)
                         SELECT CAST(SCOPE_IDENTITY() AS INT)";
 
             try
@@ -107,7 +107,7 @@ namespace TheKitchen.Data.Repos
         {
             string sql = @"UPDATE IngredientCategories
                             SET KitchenId = @KitchenId,
-                                ParentCategoryId = @ParentCategoryId,
+                                ParentIngredientCategoryId = @ParentIngredientCategoryId,
                                 Name = @Name
                             WHERE Id = @Id";
 

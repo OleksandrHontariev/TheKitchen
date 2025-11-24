@@ -1,6 +1,6 @@
 ﻿SET IDENTITY_INSERT RecipeCategories ON;
 
-INSERT INTO RecipeCategories (Id, KitchenId, ParentCategoryId, Name)
+INSERT INTO RecipeCategories (Id, KitchenId, ParentRecipeCategoryId, Name)
 VALUES
 -- Основные категории
 (1, {{kitchenId}}, NULL, N'Супы'),

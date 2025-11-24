@@ -1,4 +1,4 @@
-﻿INSERT INTO Ingredients (KitchenId, CategoryId, Title, BaseUnit, StockQuantity) VALUES
+﻿INSERT INTO Ingredients (KitchenId, IngredientCategoryId, Title, BaseUnit, StockQuantity) VALUES
 ({{kitchenId}}, 1, N'Мука пшеничная', 3, 0),
 ({{kitchenId}}, 1, N'Сахар-песок', 3, 0),
 ({{kitchenId}}, 1, N'Соль поваренная', 3, 0),

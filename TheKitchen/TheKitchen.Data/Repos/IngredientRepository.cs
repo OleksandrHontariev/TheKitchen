@@ -26,7 +26,7 @@ namespace TheKitchen.Data.Repos
                         SELECT
                             i.Id,
                             i.KitchenId,
-                            i.CategoryId,
+                            i.IngredientCategoryId,
                             i.Title,
                             i.BaseUnit,
                             i.StockQuantity
@@ -71,14 +71,14 @@ namespace TheKitchen.Data.Repos
             }
         }
 
-        public PagedResult<Ingredient> GetPagedBySearch(int kitchenId, int? categoryId, string query, int page, int pageSize)
+        public PagedResult<Ingredient> GetPagedBySearch(int kitchenId, int? ingredientCategoryId, string query, int page, int pageSize)
         {
             string pagedBySearchSql = @"
                                         SELECT *
                                         FROM Ingredients
                                         WHERE 
                                             KitchenId = @KitchenId
-                                            AND (@CategoryId IS NULL OR CategoryId = @CategoryId)
+                                            AND (@IngredientCategoryId IS NULL OR IngredientCategoryId = @IngredientCategoryId)
                                             AND (@Query IS NULL OR Title LIKE '%' + @Query + '%')
                                         ORDER BY Title
                                         OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -89,7 +89,7 @@ namespace TheKitchen.Data.Repos
                                     FROM Ingredients
                                     WHERE 
                                         KitchenId = @KitchenId
-                                        AND (@CategoryId IS NULL OR CategoryId = @CategoryId)
+                                        AND (@IngredientCategoryId IS NULL OR IngredientCategoryId = @IngredientCategoryId)
                                         AND (@Query IS NULL OR Title LIKE '%' + @Query + '%');
                                 ";
 
@@ -100,7 +100,7 @@ namespace TheKitchen.Data.Repos
                 var parameters = new
                 {
                     KitchenId = kitchenId,
-                    CategoryId = categoryId,
+                    IngredientCategoryId = ingredientCategoryId,
                     Query = string.IsNullOrWhiteSpace(query) ? null : query,
                     Offset = offset,
                     PageSize = pageSize
@@ -129,9 +129,9 @@ namespace TheKitchen.Data.Repos
         public int Add(Ingredient ingredient)
         {
             string sql = @"INSERT INTO Ingredients
-                        (KitchenId, CategoryId, Title, BaseUnit, StockQuantity)
+                        (KitchenId, IngredientCategoryId, Title, BaseUnit, StockQuantity)
                         VALUES
-                        (@KitchenId, @CategoryId, @Title, @BaseUnit, @StockQuantity)
+                        (@KitchenId, @IngredientCategoryId, @Title, @BaseUnit, @StockQuantity)
                         SELECT CAST(SCOPE_IDENTITY() AS INT)";
 
             try
@@ -151,7 +151,7 @@ namespace TheKitchen.Data.Repos
             string sql = @"
                         UPDATE Ingredients
                         SET KitchenId = @KitchenId,
-                            CategoryId = @CategoryId,
+                            IngredientCategoryId = @IngredientCategoryId,
                             Title = @Title,
                             BaseUnit = @BaseUnit,
                             StockQuantity = @StockQuantity

@@ -11,12 +11,12 @@ namespace TheKitchen.Data.Entities
     {
 		public int Id { get; set; }
 		public int KitchenId { get; set; }
-		public int? CategoryId { get; set; }
+		public int? IngredientCategoryId { get; set; }
 		public string Title { get; set; }
 		public int? BaseUnit { get; set; }
 		public decimal StockQuantity { get; set; } = default;
 
         public override string ToString() =>
-            $"[Id={Id}, KitchenId={KitchenId}, CategoryId=\"{CategoryId}\", Title=\"{Title}\", BaseUnit=\"{BaseUnit}\", StockQuantity={StockQuantity}]";
+            $"[Id={Id}, KitchenId={KitchenId}, IngredientCategoryId=\"{IngredientCategoryId}\", Title=\"{Title}\", BaseUnit=\"{BaseUnit}\", StockQuantity={StockQuantity}]";
     }
 }

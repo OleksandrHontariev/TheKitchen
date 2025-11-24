@@ -12,17 +12,17 @@ using System.Text;
 using TheKitchen.Data.Infrastructure;
 using System.Linq;
 
-// CreateDatabase();
+CreateDatabase();
 
 IConfigurationRoot config = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false)
     .Build();
 
-// CRUDL_IngredientCategories(config);
-// CRUDL_RecipeCategories(config);
-// CRUDL_Ingredients(config);
-// CRUDL_Recipes(config);
+CRUDL_IngredientCategories(config);
+CRUDL_RecipeCategories(config);
+CRUDL_Ingredients(config);
+CRUDL_Recipes(config);
 GetPagedBySearchInAllRepos(config);
 
 Console.ReadLine();
@@ -138,15 +138,14 @@ static void CRUDL_Ingredients(IConfigurationRoot config)
         Console.WriteLine("-----------------------------------");
 
         // Add
-        /*
-        ingredientsRepository.Add(new Ingredient {
+        ingredientsRepository.Add(new Ingredient
+        {
             Title = "Яйцо страусиное",
             KitchenId = 1,
-            CategoryId = null,
+            IngredientCategoryId = null,
             BaseUnit = 1,
             StockQuantity = 0
-        }); 
-         */
+        });
 
         // GetBySearchParams kitchen = 1, categoryId = null, query = null, page = 1, pageSize = 5
         var result_4 = ingredientsRepository.GetPagedBySearch(1, null, null, 1, 5);
@@ -173,7 +172,7 @@ static void CRUDL_Ingredients(IConfigurationRoot config)
 
         // Update
         Ingredient ingredient_62 = ingredientsRepository.GetById(62);
-        ingredient_62.CategoryId = 3;
+        ingredient_62.IngredientCategoryId = 3;
         ingredientsRepository.Update(ingredient_62);
 
         Ingredient updated = ingredientsRepository.GetById(62);
@@ -219,7 +218,7 @@ static void CRUDL_IngredientCategories(IConfigurationRoot config)
         // Add
         int addedId = ingredientCategoryRepository.Add(new IngredientCategory {
             KitchenId = 1,
-            ParentCategoryId = null,
+            ParentIngredientCategoryId = null,
             Name = "Тестовая категория"
         });
 
@@ -293,7 +292,7 @@ static void CRUDL_RecipeCategories(IConfigurationRoot config)
         // Add
         int addedId = recipeCategoryRepository.Add(new RecipeCategory {
             KitchenId = 1,
-            ParentCategoryId = null,
+            ParentRecipeCategoryId = null,
             Name = "Тестовая категория"
         });
 
