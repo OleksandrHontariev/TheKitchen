@@ -10,10 +10,9 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using System.Text;
 using TheKitchen.Data.Infrastructure;
+using System.Linq;
 
-string databaseName = "TheKitchen";
-CreateDatabase(databaseName);
-Console.WriteLine("Database created successfuly!");
+// CreateDatabase();
 
 IConfigurationRoot config = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
@@ -21,12 +20,16 @@ IConfigurationRoot config = new ConfigurationBuilder()
     .Build();
 
 // CRUDL_IngredientCategories(config);
-CRUDL_RecipeCategories(config);
+// CRUDL_RecipeCategories(config);
+// CRUDL_Ingredients(config);
+// CRUDL_Recipes(config);
+GetPagedBySearchInAllRepos(config);
 
 Console.ReadLine();
 
-static void CreateDatabase(string dbName)
+static void CreateDatabase()
 {
+    string dbName = "TheKitchen";
     string masterCS = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
     using (IDbConnection connection = new SqlConnection(masterCS))
     {
@@ -49,6 +52,7 @@ static void CreateDatabase(string dbName)
 
         DatabaseCreator.SeedStaticData(connection_2, id, Path.Combine(AppContext.BaseDirectory, "Sql", "Seed"));
     }
+    Console.WriteLine("Database created successfuly!");
 }
 
 static void CRUDL_Kitchen(IConfigurationRoot config)
@@ -199,8 +203,8 @@ static void CRUDL_IngredientCategories(IConfigurationRoot config)
         }
         Console.WriteLine("--------------------------------------------");
 
-        // GetBySearchedParams: kitchenId = 1, parentCategoryId = null, query = null, page = 1, pageSize = 4
-        PagedResult<IngredientCategory> result_2 = ingredientCategoryRepository.GetPagedBySearch(1, null, "продукты", 1, 16);
+        // GetBySearchedParams: kitchenId = 1, parentCategoryId = null, query = "продукты", page = 1, pageSize = 4
+        PagedResult<IngredientCategory> result_2 = ingredientCategoryRepository.GetPagedBySearch(1, null, "продукты", 1, 4);
         Console.WriteLine("TotalCount: {0}", result_2.TotalCount);
         Console.WriteLine("PageNumber: {0}", result_2.PageNumber);
         Console.WriteLine("PageSize: {0}", result_2.PageSize);
@@ -273,7 +277,7 @@ static void CRUDL_RecipeCategories(IConfigurationRoot config)
             Console.WriteLine(r);
         }
         Console.WriteLine("--------------------------------------------------");
-        // GetBySearchedParams: kitchenId = 1, parentCategoryId = null, query = "", page = 1, pageSize = 5
+        // GetBySearchedParams: kitchenId = 1, parentCategoryId = null, query = "салаты", page = 1, pageSize = 5
         PagedResult<RecipeCategory> result_3 = recipeCategoryRepository.GetPagedBySearch(1, null, "салаты", 1, 5);
         Console.WriteLine("TotalCount: {0}", result_3.TotalCount);
         Console.WriteLine("PageNumber: {0}", result_3.PageNumber);
@@ -309,5 +313,122 @@ static void CRUDL_RecipeCategories(IConfigurationRoot config)
         {
             Console.WriteLine("Deleted with id = {0}", addedId);
         }
+    }
+}
+
+static void CRUDL_Recipes(IConfigurationRoot config)
+{
+    Console.OutputEncoding = Encoding.UTF8;
+    string connectionString = config.GetConnectionString("DefaultConnection");
+    using (IDbConnection connection = new SqlConnection(connectionString))
+    {
+        connection.Open();
+        IRecipeRepository recipeRepository = new RecipeRepository(connection);
+
+        // Get
+        // GetPagedBySearch: kitchenId = 1, categoryId = null, query = null, page = 1, pageSize = 10
+        PagedResult<Recipe> result = recipeRepository.GetPagedBySearch(1, null, null, 1, 10);
+        Console.WriteLine("TotalCount: {0}", result.TotalCount);
+        Console.WriteLine("PageNumber: {0}", result.PageNumber);
+        Console.WriteLine("PageSize: {0}", result.PageSize);
+        Console.WriteLine("TotalPages: {0}", result.TotalPages);
+        Console.WriteLine("Items:");
+        foreach(Recipe r in result.Items)
+        {
+            Console.WriteLine(r);
+        }
+        Console.WriteLine("-----------------------------------");
+
+        // GetPagedBySearch: kitchenId = 1, categoryId = 1, query = null, page = 1, pageSize = 10
+        PagedResult<Recipe> result_2 = recipeRepository.GetPagedBySearch(1, 1, null, 1, 10);
+        Console.WriteLine("TotalCount: {0}", result_2.TotalCount);
+        Console.WriteLine("PageNumber: {0}", result_2.PageNumber);
+        Console.WriteLine("PageSize: {0}", result_2.PageSize);
+        Console.WriteLine("TotalPages: {0}", result_2.TotalPages);
+        Console.WriteLine("Items:");
+        foreach (Recipe r in result_2.Items)
+        {
+            Console.WriteLine(r);
+        }
+        Console.WriteLine("-----------------------------------");
+
+        // GetPagedBySearch: kitchenId = 1, categoryId = null, query = "суп", page = 1, pageSize = 10
+        PagedResult<Recipe> result_3 = recipeRepository.GetPagedBySearch(1, null, "суп", 1, 10);
+        Console.WriteLine("TotalCount: {0}", result_3.TotalCount);
+        Console.WriteLine("PageNumber: {0}", result_3.PageNumber);
+        Console.WriteLine("PageSize: {0}", result_3.PageSize);
+        Console.WriteLine("TotalPages: {0}", result_3.TotalPages);
+        Console.WriteLine("Items:");
+        foreach (Recipe r in result_3.Items)
+        {
+            Console.WriteLine(r);
+        }
+        Console.WriteLine("-----------------------------------");
+
+        Recipe recipe = new Recipe {
+            KitchenId = 1,
+            RecipeCategoryId = 3,
+            Title = "Тестовый рецепт",
+            Description = "Тестовое описание рецепта",
+            Portions = 3
+        };
+
+        // Add
+        int createdId = recipeRepository.Add(recipe);
+        Console.WriteLine("Created recipe with id = {0}, Title = {1}", createdId, recipe.Title);
+
+        // GetById
+        Recipe foundRecipe = recipeRepository.GetById(createdId);
+        Console.WriteLine("Found recipe with id = {0}", createdId);
+        Console.WriteLine(foundRecipe);
+
+        // Update
+        Recipe recipeToUpdate = recipeRepository.GetById(createdId);
+        recipeToUpdate.Title = "Отредактированный тайтл тестового рецепта";
+        if (recipeRepository.Update(recipeToUpdate))
+        {
+            Recipe updatedRecipe = recipeRepository.GetById(createdId);
+            Console.WriteLine(updatedRecipe);
+        }
+
+        // Delete
+        if (recipeRepository.Delete(createdId))
+        {
+            Console.WriteLine("Recipe deleted with id: {0}", createdId);
+        }
+    }
+}
+
+// Test GetPagedBySearch Without Setting Category And QueryString
+static void GetPagedBySearchInAllRepos(IConfigurationRoot config)
+{
+    string connectionString = config.GetConnectionString("DefaultConnection");
+    using (IDbConnection connection = new SqlConnection(connectionString))
+    {
+        connection.Open();
+
+        // RecipeRepository
+        IRecipeRepository recipeRepository = new RecipeRepository(connection);
+        // GetPagedBySearch: kitchenId = 1, recipeCategoryId = null, query = "суп", page = 1, pageSize = 10
+        PagedResult<Recipe> recipes = recipeRepository.GetPagedBySearch(1, null, "суп", 1, 10);
+        Console.WriteLine("Recipes count in result: {0}", recipes.Items.Count());
+
+        // RecipeCategoryRepository
+        IRecipeCategoryRepository recipeCategoryRepository = new RecipeCategoryRepository(connection);
+        // GetPagedBySearch: kitchenId = 1, parentCategoryId = null, query = "блюда", page = 1, pageSize = 10
+        PagedResult<RecipeCategory> recipeCategories = recipeCategoryRepository.GetPagedBySearch(1, null, "блюда", 1, 10);
+        Console.WriteLine("Recipe categories count in result: {0}", recipeCategories.Items.Count());
+
+        // IngredientRepository
+        IIngredientRepository ingredientRepository = new IngredientRepository(connection);
+        // GetPagedBySearch: kitchenId = 1, categoryId = null, query = "Хлеб", page = 1, pageSize = 10
+        PagedResult<Ingredient> ingredients = ingredientRepository.GetPagedBySearch(1, null, "Хлеб", 1, 10);
+        Console.WriteLine("Ingredients count in result: {0}", ingredients.Items.Count());
+
+        // IngredientCategoryRepository
+        IIngredientCategoryRepository ingredientCategoryRepository = new IngredientCategoryRepository(connection);
+        // GetPagedBySearch: kitchenId = 1, parentCategoryId = null, query = "продукты", page = 1, pageSize = 10
+        PagedResult<IngredientCategory> ingredientCategories = ingredientCategoryRepository.GetPagedBySearch(1, null, "продукты", 1, 10);
+        Console.WriteLine("Ingredient categories count in result: {0}", ingredientCategories.Items.Count());
     }
 }

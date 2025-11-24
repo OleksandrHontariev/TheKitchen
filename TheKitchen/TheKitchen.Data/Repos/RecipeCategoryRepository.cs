@@ -47,10 +47,7 @@ namespace TheKitchen.Data.Repos
                                     SELECT *
                                     FROM RecipeCategories
                                     WHERE KitchenId = @KitchenId
-                                        AND (
-                                            (@ParentCategoryId IS NULL AND ParentCategoryId IS NULL) OR
-                                            (@ParentCategoryId IS NOT NULL AND ParentCategoryId = @ParentCategoryId)
-                                        )
+                                        AND (@ParentCategoryId IS NULL OR ParentCategoryId = @ParentCategoryId)
                                         AND (@Query IS NULL OR Name LIKE '%' + @Query + '%')
                                     ORDER BY Name
                                     OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -60,10 +57,7 @@ namespace TheKitchen.Data.Repos
                                     FROM RecipeCategories
                                     WHERE 
                                         KitchenId = @KitchenId
-                                        AND (
-                                                (@ParentCategoryId IS NULL AND ParentCategoryId IS NULL)
-                                             OR (@ParentCategoryId IS NOT NULL AND ParentCategoryId = @ParentCategoryId)
-                                            )
+                                        AND (@ParentCategoryId IS NULL OR ParentCategoryId = @ParentCategoryId)
                                         AND (@Query IS NULL OR Name LIKE '%' + @Query + '%');
                                 ";
 
@@ -83,7 +77,7 @@ namespace TheKitchen.Data.Repos
 
                 Logger.Info($"Paged search categories: items={items.Count()}, total={totalCount}, page={page}");
                 return new PagedResult<RecipeCategory> {
-                    Items = items,
+                    Items = items.ToList(),
                     TotalCount = totalCount,
                     PageNumber = page,
                     PageSize = pageSize

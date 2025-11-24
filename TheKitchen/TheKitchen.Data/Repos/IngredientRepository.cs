@@ -78,10 +78,7 @@ namespace TheKitchen.Data.Repos
                                         FROM Ingredients
                                         WHERE 
                                             KitchenId = @KitchenId
-                                            AND (
-                                                    (@CategoryId IS NULL AND CategoryId IS NULL)
-                                                 OR (@CategoryId IS NOT NULL AND CategoryId = @CategoryId)
-                                                )
+                                            AND (@CategoryId IS NULL OR CategoryId = @CategoryId)
                                             AND (@Query IS NULL OR Title LIKE '%' + @Query + '%')
                                         ORDER BY Title
                                         OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
@@ -92,10 +89,7 @@ namespace TheKitchen.Data.Repos
                                     FROM Ingredients
                                     WHERE 
                                         KitchenId = @KitchenId
-                                        AND (
-                                                (@CategoryId IS NULL AND CategoryId IS NULL)
-                                             OR (@CategoryId IS NOT NULL AND CategoryId = @CategoryId)
-                                            )
+                                        AND (@CategoryId IS NULL OR CategoryId = @CategoryId)
                                         AND (@Query IS NULL OR Title LIKE '%' + @Query + '%');
                                 ";
 

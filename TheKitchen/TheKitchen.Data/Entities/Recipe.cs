@@ -10,8 +10,10 @@ namespace TheKitchen.Data.Entities
     {
         public int Id { get; set; }
         public int KitchenId { get; set; }
+        public int? RecipeCategoryId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public int Portions { get; set; }
+        public override string ToString() => $"[Id={Id}, KitchenId={KitchenId}, RecipeCategoryId=\"{RecipeCategoryId}\", Title=\"{Title}\", Description=\"{Description}\", Portions={Portions}]";
     }
 }
