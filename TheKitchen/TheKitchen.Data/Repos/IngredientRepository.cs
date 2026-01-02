@@ -20,34 +20,36 @@ namespace TheKitchen.Data.Repos
             _connection = connection;
         }
 
-        public IEnumerable<Ingredient> GetByRecipeId(int id)
-        {
-            string sql = @"
-                        SELECT
-                            i.Id,
-                            i.KitchenId,
-                            i.IngredientCategoryId,
-                            i.Title,
-                            i.BaseUnit,
-                            i.StockQuantity
-                        FROM RecipeDetails rd
-                        JOIN Ingredients i ON rd.IngredientId = i.Id
-                        WHERE RecipeId = @Id
-                        ORDER BY rd.Ordering
-                        ";
+        /*
+                public IEnumerable<Ingredient> GetByRecipeId(int id)
+                {
+                    string sql = @"
+                                SELECT
+                                    i.Id,
+                                    i.KitchenId,
+                                    i.IngredientCategoryId,
+                                    i.Title,
+                                    i.BaseUnit,
+                                    i.StockQuantity
+                                FROM RecipeDetails rd
+                                JOIN Ingredients i ON rd.IngredientId = i.Id
+                                WHERE RecipeId = @Id
+                                ORDER BY rd.Ordering
+                                ";
 
-            try
-            {
-                IEnumerable<Ingredient> data = _connection.Query<Ingredient>(sql, new { Id = id });
-                Logger.Info($"Getting list of ingredients of length {data.Count()}");
-                return data;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Error while getting list of ingredients");
-                throw;
-            }
-        }
+                    try
+                    {
+                        IEnumerable<Ingredient> data = _connection.Query<Ingredient>(sql, new { Id = id });
+                        Logger.Info($"Getting list of ingredients of length {data.Count()}");
+                        return data;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex, "Error while getting list of ingredients");
+                        throw;
+                    }
+                } 
+        */
 
         public Ingredient GetById(int id)
         {

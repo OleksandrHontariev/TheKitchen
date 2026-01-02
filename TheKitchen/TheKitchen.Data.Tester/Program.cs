@@ -19,11 +19,12 @@ IConfigurationRoot config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: false)
     .Build();
 
-CRUDL_IngredientCategories(config);
-CRUDL_RecipeCategories(config);
-CRUDL_Ingredients(config);
-CRUDL_Recipes(config);
-GetPagedBySearchInAllRepos(config);
+// CRUDL_IngredientCategories(config);
+// CRUDL_RecipeCategories(config);
+// CRUDL_Ingredients(config);
+// CRUDL_Recipes(config);
+// GetPagedBySearchInAllRepos(config);
+CRUDL_RecipeDetails(config);
 
 Console.ReadLine();
 
@@ -429,5 +430,70 @@ static void GetPagedBySearchInAllRepos(IConfigurationRoot config)
         // GetPagedBySearch: kitchenId = 1, parentCategoryId = null, query = "продукты", page = 1, pageSize = 10
         PagedResult<IngredientCategory> ingredientCategories = ingredientCategoryRepository.GetPagedBySearch(1, null, "продукты", 1, 10);
         Console.WriteLine("Ingredient categories count in result: {0}", ingredientCategories.Items.Count());
+    }
+}
+
+static void CRUDL_RecipeDetails (IConfigurationRoot config)
+{
+    using (SqlConnection connection = new SqlConnection(config.GetConnectionString("DefaultConnection")))
+    {
+        connection.Open();
+
+        KitchenRepository kitchenRepository = new KitchenRepository(connection);
+
+        int kitchenId = kitchenRepository.Add(new Kitchen
+        {
+            Name = "Пица Хата",
+            Description = "Приготовление вкусной пицы!",
+            TablesCount = 18,
+        });
+
+        Console.WriteLine($"Added kitchen with id: {kitchenId}");
+
+        RecipeRepository recipeRepository = new RecipeRepository(connection);
+
+        int id = recipeRepository.Add(new Recipe {
+            KitchenId = 1,
+            RecipeCategoryId = null,
+            Title = "Тестовый рецепт",
+            Description = "Описание тестового рецепта",
+            Portions = 4
+        });
+
+        RecipeDetailRepository recipeDetailRepository = new RecipeDetailRepository(connection);
+
+        int addedId = recipeDetailRepository.Add(new RecipeDetail {
+            KitchenId = kitchenId,
+            RecipeId = id,
+            IngredientId = 91,
+            UnitId = 2,
+            Ordering = 1,
+            Quantity = 300
+        });
+
+        recipeDetailRepository.Add(new RecipeDetail {
+            KitchenId = kitchenId,
+            RecipeId = id,
+            IngredientId = 90,
+            UnitId = 2,
+            Ordering = 2,
+            Quantity = 200
+        });
+
+        IEnumerable<RecipeDetail> recipeDetails = recipeDetailRepository.GetByRecipeId(kitchenId, id);
+        foreach (var recipeDetail in recipeDetails)
+        {
+            Console.WriteLine(recipeDetail);
+        }
+
+        RecipeDetail rd = recipeDetailRepository.GetById(addedId);
+        rd.ToString();
+
+        recipeDetailRepository.Delete(addedId);
+
+        foreach (var recipeDetail in recipeDetailRepository.GetByRecipeId(kitchenId, id))
+        {
+            recipeDetail.ToString();
+        }
     }
 }

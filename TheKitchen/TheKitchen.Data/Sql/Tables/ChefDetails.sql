@@ -5,6 +5,12 @@ CREATE TABLE ChefDetails(
 	PhoneNumber char(14) CONSTRAINT CK_CheafDetails_PhoneNumber CHECK(PhoneNumber LIKE '([0-9][0-9][0-9])[0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'),
 	PasspordNumber nvarchar(50) NULL,
 	BirthDate date NULL,
-	Address nvarchar(500) NULL,
+	Country nvarchar(100) NOT NULL,
+	Region nvarchar(100) NULL,
+	City nvarchar(100) NOT NULL,
+	Street nvarchar(150) NOT NULL,
+	House nvarchar(20) NOT NULL,
+	Apartment nvarchar(20) NULL,
+	PostalCode nvarchar(20) NULL,
 	Notes nvarchar(max) NULL
 );
